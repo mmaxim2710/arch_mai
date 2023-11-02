@@ -8,7 +8,7 @@ RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && ./c
 RUN git clone https://github.com/mfontanini/cppkafka && cd cppkafka && mkdir build && cd build && cmake .. && make && sudo make install && cd 
 RUN git clone https://github.com/mmaxim2710/arch_mai.git 
 RUN cd ./arch_mai && mkdir build && cd build && cmake ..
-RUN cat Makefile
+RUN ls
 RUN make event_listener
 RUN sudo ldconfig
 ENTRYPOINT [ "arch_mai/build/event_listener" ]
