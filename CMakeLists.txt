@@ -4,7 +4,7 @@ project(hl_server C CXX)
 
 SET (AUTH_SERVICE "auth_service")
 SET (USER_SERVICE "user_service")
-# SET (EVENT_LISTENER "event_listener")
+SET (EVENT_LISTENER "event_listener")
 SET (PRODUCT_SERVICE "product_service")
 
 set (STD_CXX "c++17")
@@ -74,25 +74,25 @@ target_link_libraries(${USER_SERVICE} PRIVATE
                             CppKafka::cppkafka)
 
 
-# add_executable(${EVENT_LISTENER} event_main.cpp 
-#     config/config.cpp 
-#     database/database.cpp 
-#     database/user.cpp
-#     database/cache.cpp)
-# target_include_directories(${EVENT_LISTENER} PRIVATE "${CMAKE_BINARY_DIR}")
-# target_compile_options(${EVENT_LISTENER} PRIVATE -Wall -Wextra -pedantic -Werror )
-# set_target_properties(${EVENT_LISTENER} PROPERTIES LINKER_LANGUAGE CXX)
-# set_target_properties(${EVENT_LISTENER} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+add_executable(${EVENT_LISTENER} event_main.cpp 
+    config/config.cpp 
+    database/database.cpp 
+    database/user.cpp
+    database/cache.cpp)
+target_include_directories(${EVENT_LISTENER} PRIVATE "${CMAKE_BINARY_DIR}")
+target_compile_options(${EVENT_LISTENER} PRIVATE -Wall -Wextra -pedantic -Werror )
+set_target_properties(${EVENT_LISTENER} PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${EVENT_LISTENER} PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
 
-# target_link_libraries(${EVENT_LISTENER} PRIVATE 
-#                             ${CMAKE_THREAD_LIBS_INIT} 
-#                             ${Poco_LIBRARIES}
-#                             "PocoData"
-#                             "PocoDataMySQL"
-#                             "mysqlclient"
-#                             "rdkafka++"
-#                             ZLIB::ZLIB
-#                             CppKafka::cppkafka)
+target_link_libraries(${EVENT_LISTENER} PRIVATE 
+                            ${CMAKE_THREAD_LIBS_INIT} 
+                            ${Poco_LIBRARIES}
+                            "PocoData"
+                            "PocoDataMySQL"
+                            "mysqlclient"
+                            "rdkafka++"
+                            ZLIB::ZLIB
+                            CppKafka::cppkafka)
 
 add_executable(${PRODUCT_SERVICE} product_main.cpp 
     config/config.cpp 
