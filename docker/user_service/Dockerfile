@@ -7,6 +7,6 @@ RUN git clone https://github.com/tdv/redis-cpp.git && cd redis-cpp && mkdir buil
 RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && ./configure && make && sudo make install && cd 
 RUN git clone https://github.com/mfontanini/cppkafka && cd cppkafka && mkdir build && cd build && cmake .. && make && sudo make install && cd 
 RUN sudo ldconfig
-RUN git clone https://github.com/PavelProjects/arch_lab.git
+RUN git clone https://github.com/mmaxim2710/arch_mai.git
 RUN cd ./arch_lab && mkdir build && cd build && cmake  .. && make user_service
 ENTRYPOINT [ "arch_lab/build/user_service" ]
