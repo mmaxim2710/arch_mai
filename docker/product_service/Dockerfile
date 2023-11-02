@@ -6,6 +6,6 @@ RUN git clone --depth 1 --branch poco-1.12.4-release https://github.com/pocoproj
 RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && ./configure && make && sudo make install && cd 
 RUN git clone https://github.com/mfontanini/cppkafka && cd cppkafka && mkdir build && cd build && cmake .. && make && sudo make install && cd 
 RUN git clone https://github.com/mmaxim2710/arch_mai.git
-RUN cd ./arch_lab && mkdir build && cd build && cmake  .. && make product_service
+RUN cd ./arch_mai && mkdir build && cd build && cmake  .. && make product_service
 RUN sudo ldconfig
-ENTRYPOINT [ "arch_lab/build/product_service" ]
+ENTRYPOINT [ "arch_mai/build/product_service" ]
