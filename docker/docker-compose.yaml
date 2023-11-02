@@ -1,0 +1,303 @@
+version: '3.3'
+
+services:
+  db_node_01:
+    build:
+      context: mariadb
+      dockerfile: Dockerfile
+    container_name: db_node_01
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_LOGIN}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: '1'
+    command: >
+      --sql-mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
+      --general-log=ON
+      --log-queries-not-using-indexes=ON
+    networks:
+      - arch-network
+    ports:
+      - 3360:${DB_PORT}
+    healthcheck:
+      test: "/usr/bin/mysql --host=db_node_01 --database=${DB_DATABASE} --user=${DB_LOGIN} --password=${DB_PASSWORD} --execute \"SHOW DATABASES;\""
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./mariadb/rollout/user:/docker-entrypoint-initdb.d
+      - db-node-01-data:/var/lib/mysql
+
+  db_node_02:
+    build:
+      context: mariadb
+      dockerfile: Dockerfile
+    container_name: db_node_02
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_LOGIN}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: '1'
+    command: >
+      --sql-mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
+      --general-log=ON
+      --log-queries-not-using-indexes=ON
+    networks:
+      - arch-network
+    ports:
+      - 3361:${DB_PORT}
+    healthcheck:
+      test: "/usr/bin/mysql --host=db_node_02 --database=${DB_DATABASE} --user=${DB_LOGIN} --password=${DB_PASSWORD} --execute \"SHOW DATABASES;\""
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./mariadb/rollout/user:/docker-entrypoint-initdb.d
+      - db-node-02-data:/var/lib/mysql
+
+# sequences
+  db_node_03:
+    build:
+      context: mariadb
+      dockerfile: Dockerfile
+    container_name: db_node_03
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_LOGIN}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: '1'
+    command: >
+      --sql-mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
+      --general-log=ON
+      --log-queries-not-using-indexes=ON
+    networks:
+      - arch-network
+    ports:
+      - 3362:${DB_PORT}
+    healthcheck:
+      test: "/usr/bin/mysql --host=db_node_03 --database=${DB_DATABASE} --user=${DB_LOGIN} --password=${DB_PASSWORD} --execute \"SHOW DATABASES;\""
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./mariadb/rollout/sequence:/docker-entrypoint-initdb.d
+      - db-node-03-data:/var/lib/mysql
+
+  proxysql:
+    build:
+      context: proxysql
+      dockerfile: Dockerfile
+    container_name: proxysql
+    # volumes:
+    #   - proxysql-data:/var/lib/proxysql
+    healthcheck:
+      test: "/usr/bin/mysql -h 127.0.0.1 -P ${DB_RPOXY_PORT} --user=stud --password=stud --execute \"SHOW DATABASES;\""
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - db_node_01
+      - db_node_02
+      - db_node_03
+    networks:
+      - arch-network
+    ports:
+      # Mysql Client Port
+      - 6033:${DB_RPOXY_PORT}
+      # Mysql Admin Port
+      - "6032:6032"
+
+  kafka1:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka1
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_PROCESS_ROLES: "broker,controller"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://kafka1:9092"
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_KRAFT_CLUSTER_ID: "dh6khitPSDGZSBOjNeTC_g"
+    volumes:
+      - kafka_volume1:/bitnami/kafka
+    networks:
+      - arch-network
+    healthcheck:
+    # хака, не получилось сделать нормальный healthcheck
+      test: "ls" 
+      start_period: 10s
+  
+  kafka2:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka2
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_PROCESS_ROLES: "broker,controller"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://kafka2:9092"
+      KAFKA_BROKER_ID: 2
+      KAFKA_CFG_NODE_ID: 2
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_KRAFT_CLUSTER_ID: "dh6khitPSDGZSBOjNeTC_g"
+    volumes:
+      - kafka_volume2:/bitnami/kafka
+    networks:
+      - arch-network
+    healthcheck:
+      test: "ls"
+      start_period: 10s
+
+  auth_service:
+    build:
+      context: auth_service
+      dockerfile: Dockerfile
+    container_name: auth_service
+    environment:
+      DB_HOST: proxysql #${DB_HOST}
+      DB_PORT: ${DB_RPOXY_PORT}
+      DB_LOGIN: ${DB_LOGIN}
+      DB_PASSWORD: ${DB_LOGIN}
+      DB_DATABASE: ${DB_DATABASE}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      MAX_SHARD: 1
+      SEQUENCE_SHARD: 2
+      CREATE_TEST_USERS: 1
+      QUEUE_HOST: kafka1:9092
+      QUEUE_TOPIC: event_server
+      QUEUE_GROUP_ID: 0
+    ports:
+      - ${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}
+    networks:
+      - arch-network
+    depends_on:
+      proxysql:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+
+  user_service:
+    build:
+      context: user_service
+      dockerfile: Dockerfile
+    container_name: user_service
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_RPOXY_PORT}
+      DB_LOGIN: ${DB_LOGIN}
+      DB_PASSWORD: ${DB_LOGIN}
+      DB_DATABASE: ${DB_DATABASE}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      AUTH_SERVICE_HOST: auth_service
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      MAX_SHARD: 1
+      SEQUENCE_SHARD: 2
+      QUEUE_HOST: kafka1:9092
+      QUEUE_TOPIC: event_server
+      QUEUE_GROUP_ID: 0
+      CACHE_HOST: cache
+      CACHE_PORT: ${CACHE_PORT}
+    ports:
+      - ${USER_SERVICE_PORT}:${USER_SERVICE_PORT}
+    networks:
+      - arch-network
+    depends_on:
+      proxysql:
+        condition: service_healthy
+      kafka1:
+        condition: service_healthy
+      kafka2:
+        condition: service_healthy
+
+  # event_listener:
+  #   build:
+  #     context: event_listener
+  #     dockerfile: Dockerfile
+  #   container_name: event_listener
+  #   environment:
+  #     DB_HOST: ${DB_HOST}
+  #     DB_PORT: ${DB_RPOXY_PORT}
+  #     DB_LOGIN: ${DB_LOGIN}
+  #     DB_PASSWORD: ${DB_LOGIN}
+  #     DB_DATABASE: ${DB_DATABASE}
+  #     MAX_SHARD: 1
+  #     SEQUENCE_SHARD: 2
+  #     QUEUE_HOST: kafka1:9092
+  #     QUEUE_TOPIC: event_server
+  #     QUEUE_GROUP_ID: 0
+  #     CACHE_HOST: cache
+  #     CACHE_PORT: ${CACHE_PORT}
+  #   networks:
+  #     - arch-network
+  #   depends_on:
+  #     proxysql:
+  #       condition: service_healthy
+  #     kafka1:
+  #       condition: service_healthy
+  #     kafka2:
+  #       condition: service_healthy
+
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning 
+    networks:
+      - arch-network
+    volumes: 
+      - cache:/data
+
+  product_service:
+    build:
+      context: product_service
+      dockerfile: Dockerfile
+    container_name: product_service
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_RPOXY_PORT}
+      DB_LOGIN: ${DB_LOGIN}
+      DB_PASSWORD: ${DB_LOGIN}
+      DB_DATABASE: ${DB_DATABASE}
+      AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
+      AUTH_SERVICE_HOST: auth_service
+      PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+    ports:
+      - ${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}
+    networks:
+      - arch-network
+    depends_on:
+      proxysql:
+        condition: service_healthy
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.4.0
+    ports:
+      - "8888:8080"
+    environment:
+      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "kafka1:9093,kafka2:9093"
+      KAFKA_CLUSTERS_0_NAME: "kraft"
+    networks:
+      - arch-network
+
+volumes:
+  db-node-01-data:
+  db-node-02-data:
+  db-node-03-data:
+  proxysql-data:
+  cache:
+  kafka_volume1:
+  kafka_volume2:
+
+networks:
+  arch-network:
+    driver: "bridge"
+    external: false
