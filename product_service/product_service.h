@@ -38,19 +38,27 @@ static long create_product(long &user_id, std::string user_login, std::string &b
     std::cout << "Creating new product by " << user_login << " :: " + user_id << std::endl;
     std::cout << body << std::endl;
 
+    std::cout << ">> 2" << std::endl;
     database::Product product = database::Product::fromJson(body);
+    std::cout << ">> 3" << std::endl;
     std::string validation_result;
+    std::cout << ">> 4" << std::endl;
     if (!validate_product(product, validation_result)) {
+        std::cout << ">> 5" << std::endl;
         throw validation_exception(validation_result);
     }
+    std::cout << ">> 6" << std::endl;
     database::User seller = database::User::get_by_id(user_id);
 
     if (seller.get_id() <= 0) {
+        std::cout << ">> 7" << std::endl;
         throw validation_exception("Can't find user by id " + std::to_string(user_id));
     }
+    std::cout << ">> 8" << std::endl;
     product.seller_id() = seller.get_id();
+    std::cout << ">> 9" << std::endl;
     product.save_to_db();
-
+    std::cout << ">> 10" << std::endl;
     return product.get_id();
 }
 

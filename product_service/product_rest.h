@@ -124,7 +124,7 @@ class ProductRequesthandler: public HTTPRequestHandler {
                 if (!validateToken(scheme, token, id, login)) {
                     throw access_denied_exception("Failed to authorize user");
                 }
-                std::cout << "Authorized user " << login << std::endl;
+                std::cout << "Authorized user " << login << " with id=" << id << std::endl;
 
                 if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET) {
                     const Poco::URI uri(request.getURI());
@@ -145,19 +145,14 @@ class ProductRequesthandler: public HTTPRequestHandler {
                         Poco::JSON::Stringifier::stringify(arr, ostr);
                     }
                 } else if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) {
-                    std::cout << "POST /product" << std::endl;
+                    std::cout << "[1] now user id from token is " << id << std::endl;
                     std::string body = extractBody(request.stream(), request.getContentLength());
-                    std::cout << ">> 1" << std::endl;
+                    std::cout << "Creating prodcut for user id=" << id << ", login=" << login << std::endl;
                     long created = create_product(id, login, body);
-                    std::cout << ">> 2" << std::endl;
                     response.setStatus(Poco::Net::HTTPResponse::HTTP_CREATED);
-                    std::cout << ">> 3" << std::endl;
                     response.setChunkedTransferEncoding(true);
-                    std::cout << ">> 4" << std::endl;
                     response.setContentType("application/json");
-                    std::cout << ">> 5" << std::endl;
                     std::ostream &ostr = response.send();
-                    std::cout << ">> 6" << std::endl;
                     ostr << created;
                 } else if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT) {
                     std::string body = extractBody(request.stream(), request.getContentLength());
