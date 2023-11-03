@@ -31,23 +31,22 @@ bool validate_product(database::Product &product, std::string &message) {
     return result;
 }
 
-static long create_product(long &user_id, std::string user_login, std::string &body) {
+static long create_product(long user_id, std::string user_login, std::string &body) {
+    std::cout << "[2] now user id from token is " << user_id << std::endl;
     if (body.length() == 0) {
         throw validation_exception("Body is missing!");
     }
+    std::cout << "[3] now user id from token is " << user_id << std::endl;
     std::cout << "Creating new product by " << user_login << " :: " + user_id << std::endl;
     std::cout << body << std::endl;
 
-    std::cout << ">> 2" << std::endl;
     database::Product product = database::Product::fromJson(body);
-    std::cout << ">> 3" << std::endl;
     std::string validation_result;
-    std::cout << ">> 4" << std::endl;
     if (!validate_product(product, validation_result)) {
-        std::cout << ">> 5" << std::endl;
         throw validation_exception(validation_result);
     }
     std::cout << ">> 6" << std::endl;
+    std::cout << "[4] now user id from token is " << user_id << std::endl;
     database::User seller = database::User::get_by_id(user_id);
 
     if (seller.get_id() <= 0) {
