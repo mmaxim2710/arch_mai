@@ -6,8 +6,8 @@ RUN git clone --depth 1 --branch poco-1.12.4-release https://github.com/pocoproj
 RUN git clone https://github.com/tdv/redis-cpp.git && cd redis-cpp && mkdir build && cd build && cmake .. && make && sudo make install && cd .. && cd .. 
 RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && ./configure && make && sudo make install && cd 
 RUN git clone https://github.com/mfontanini/cppkafka && cd cppkafka && mkdir build && cd build && cmake .. && make && sudo make install && cd
-ADD https://api.github.com/repos/mmaxim2710/arch_mai/git/refs/heads/main version.json
 RUN sudo ldconfig
+ADD https://api.github.com/repos/mmaxim2710/arch_mai/git/refs/heads/main version.json
 RUN git clone https://github.com/mmaxim2710/arch_mai.git
 RUN cd ./arch_mai && mkdir build && cd build && cmake  .. && make user_service
 ENTRYPOINT [ "arch_mai/build/user_service" ]
