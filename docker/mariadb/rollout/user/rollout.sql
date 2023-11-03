@@ -32,8 +32,8 @@ create table _product (
     PRIMARY KEY(id)
 );
 
-insert into _user(login, password,  name, email) values ('autotest1', '123', 'Test User 1', 'email@dot1.com');
-insert into _user(login, password,  name, email) values ('autotest2', '123', 'Test User 2', 'email@dot2.com');
+insert into _user(id, login, password,  name, email) values (1, 'autotest1', '123', 'Test User 1', 'email@dot1.com');
+insert into _user(id, login, password,  name, email) values (2, 'autotest2', '123', 'Test User 2', 'email@dot2.com');
 insert into _users_roles select r.id, u.id from _user u, _roles r where u.login = 'autotest1' and r.name = 'admin';
 
 insert into _product (name, description, cost, seller_id) 
