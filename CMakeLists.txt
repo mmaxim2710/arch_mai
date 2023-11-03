@@ -106,6 +106,7 @@ target_link_libraries(${EVENT_LISTENER} PRIVATE
                             ${CMAKE_THREAD_LIBS_INIT} 
                             ${Poco_LIBRARIES}
                             "PocoData"
+                            "PocoJWT"
                             "PocoDataMySQL"
                             "mysqlclient"
                             "rdkafka++"
