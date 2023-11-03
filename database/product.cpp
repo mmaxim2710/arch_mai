@@ -262,7 +262,7 @@ namespace database {
         
         lot.id() = getOrDefault<long>(object, "id", 0);
         lot.name() = getOrDefault<std::string>(object, "name", "");
-        lot.description() = getOrDefault<std::string>(object, "name", "");
+        lot.description() = getOrDefault<std::string>(object, "description", "");
         lot.cost() = getOrDefault<float>(object, "cost", 0);
         lot.seller_id() = getOrDefault<long>(object, "seller_id", 0);
         lot.deleted() = getOrDefault<bool>(object, "deleted", false);

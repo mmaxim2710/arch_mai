@@ -47,12 +47,12 @@ static long create_product(long user_id, std::string user_login, std::string &bo
     }
     std::cout << ">> 6" << std::endl;
     std::cout << "[4] now user id from token is " << user_id << std::endl;
-    database::User seller = database::User::get_by_id(user_id, false);
+    // database::User seller = database::User::get_by_id(user_id, false);
 
-    if (seller.get_id() <= 0) {
-        throw validation_exception("Can't find user by id " + std::to_string(user_id));
-    }
-    product.seller_id() = seller.get_id();
+    // if (seller.get_id() <= 0) {
+    //     throw validation_exception("Can't find user by id " + std::to_string(user_id));
+    // }
+    // product.seller_id() = seller.get_id();
     product.save_to_db();
     std::cout << ">> 10" << std::endl;
     return product.get_id();
