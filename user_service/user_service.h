@@ -54,7 +54,7 @@ void edit_user(long user_id, std::string body) {
         throw validation_exception("Can't edit without user id!");
     }
 
-    database::User user = database::User::get_by_id(obj->getValue<long>("id"));
+    database::User user = database::User::get_by_id(obj->getValue<long>("id"), true);
     if (user.get_id() <= 0) {
         throw not_found_exception("Can't find user");
     } else if (user.get_id() != user_id && !database::User::have_role(user_id, "admin")) {
@@ -110,7 +110,7 @@ database::User get_by_id(std::vector<std::pair<std::string, std::string>> params
     if (id < 1) {
         throw validation_exception("Id param is missing!");
     }
-    return database::User::get_by_id(id);
+    return database::User::get_by_id(id, true);
 }
 
 void delete_user(long user_id, std::vector<std::pair<std::string, std::string>> params) {
@@ -130,7 +130,7 @@ void delete_user(long user_id, std::vector<std::pair<std::string, std::string>> 
     }
 
 
-    database::User user = database::User::get_by_id(delete_user_id);
+    database::User user = database::User::get_by_id(delete_user_id, true);
     if (user.get_id() <= 0) {
         throw not_found_exception("Can't find user");
     }

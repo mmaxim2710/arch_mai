@@ -54,7 +54,7 @@ namespace database {
                 Poco::Data::RecordSet rs(select);
                 if (rs.moveFirst()) {
                     if (database::Cache::get().is_cache_enabled()) {
-                        User user = get_by_id(id);
+                        User user = get_by_id(id, true);
                         user.save_to_cache();
                     }
                     return id;
@@ -157,14 +157,17 @@ namespace database {
         }
     }
 
-    User User::get_by_id(long id) {
-        std::cout << "[5] now user id from token is " << id << std::endl;
-        User cache_user = get_from_cache_by_id(id);
-        std::cout << "[6] now user id from token is " << id << std::endl;
-        if (cache_user.get_id() > 0) {
-            std::cout << "Got user from cache!" << std::endl;
-            return cache_user;
+    User User::get_by_id(long id, bool is_use_cache) {
+        if (is_use_cache) {
+            std::cout << "[5] now user id from token is " << id << std::endl;
+            User cache_user = get_from_cache_by_id(id);
+            std::cout << "[6] now user id from token is " << id << std::endl;
+            if (cache_user.get_id() > 0) {
+                std::cout << "Got user from cache!" << std::endl;
+                return cache_user;
+            }
         }
+        
 
         try {
             Poco::Data::Session session = database::Database::get().create_session();

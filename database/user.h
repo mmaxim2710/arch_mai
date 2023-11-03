@@ -53,7 +53,7 @@ namespace database {
             bool &deleted();
 
             static long auth(std::string &login, std::string &password);
-            static User get_by_id(long id);
+            static User get_by_id(long id, bool is_use_cache);
             static std::vector<User> search(User likeUser);
             static bool have_role(long user_id, std::string role_name);
             static void add_role(long user_id, std::string role_name);

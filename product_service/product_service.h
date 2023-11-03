@@ -47,7 +47,7 @@ static long create_product(long user_id, std::string user_login, std::string &bo
     }
     std::cout << ">> 6" << std::endl;
     std::cout << "[4] now user id from token is " << user_id << std::endl;
-    database::User seller = database::User::get_by_id(user_id);
+    database::User seller = database::User::get_by_id(user_id, false);
 
     if (seller.get_id() <= 0) {
         throw validation_exception("Can't find user by id " + std::to_string(user_id));
