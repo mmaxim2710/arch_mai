@@ -37,7 +37,7 @@ static long create_product(long user_id, std::string user_login, std::string &bo
         throw validation_exception("Body is missing!");
     }
     std::cout << "[3] now user id from token is " << user_id << std::endl;
-    std::cout << "Creating new product by " << user_login << " :: " + user_id << std::endl;
+    std::cout << "Creating new product by " << user_login << " :: " << user_id << std::endl;
     std::cout << body << std::endl;
 
     database::Product product = database::Product::fromJson(body);
