@@ -158,7 +158,9 @@ namespace database {
     }
 
     User User::get_by_id(long id) {
+        std::cout << "[5] now user id from token is " << id << std::endl;
         User cache_user = get_from_cache_by_id(id);
+        std::cout << "[6] now user id from token is " << id << std::endl;
         if (cache_user.get_id() > 0) {
             std::cout << "Got user from cache!" << std::endl;
             return cache_user;

@@ -50,12 +50,9 @@ static long create_product(long user_id, std::string user_login, std::string &bo
     database::User seller = database::User::get_by_id(user_id);
 
     if (seller.get_id() <= 0) {
-        std::cout << ">> 7" << std::endl;
         throw validation_exception("Can't find user by id " + std::to_string(user_id));
     }
-    std::cout << ">> 8" << std::endl;
     product.seller_id() = seller.get_id();
-    std::cout << ">> 9" << std::endl;
     product.save_to_db();
     std::cout << ">> 10" << std::endl;
     return product.get_id();
