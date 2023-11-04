@@ -43,6 +43,7 @@ namespace database{
         } catch (Poco::Data::SessionPoolExhaustedException &e) {
             std::cout << "[ERROR]: the maximum number of sessions for this pool has already been created: " << e.what() << std::endl;
         }
+        return Poco::Data::Session(Poco::Data::MySQL::Connector::KEY, _connection_string);
     }
 
     size_t Database::get_max_shard() {
