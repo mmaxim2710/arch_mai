@@ -27,11 +27,10 @@ namespace database {
             static std::string build_search_cache_key(User &like_user);
 
             static User from_json_object(Poco::JSON::Object::Ptr);
-
-            Poco::JSON::Object::Ptr toJSONWithPassword() const;
         public:
             static User fromJson(const std::string &json);
             Poco::JSON::Object::Ptr toJSON() const;
+            Poco::JSON::Object::Ptr toJSONWithPassword() const;
             static User empty() {
                 User user;
                 user._id = -1;

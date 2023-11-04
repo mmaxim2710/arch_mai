@@ -23,7 +23,7 @@ bool send_to_queue(database::User &user) {
     
     std::lock_guard<std::mutex> lock(mtx);
     std::stringstream ss;
-    Poco::JSON::Stringifier::stringify(user.toJSON(), ss);
+    Poco::JSON::Stringifier::stringify(user.toJSONWithPassword(), ss);
     std::string message = ss.str();
     std::string event_type = user.get_id() > 0 ? QUEUE_EVENT_UPDATE : QUEUE_EVENT_CREATE;
     bool not_sent = true;
