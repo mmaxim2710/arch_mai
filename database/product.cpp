@@ -184,11 +184,14 @@ namespace database {
     }
 
     void Product::insert_entity() {
+        std::cout << ">> 9" << std::endl;
         Poco::Data::Session session = database::Database::get().create_session();
+        std::cout << ">> 10" << std::endl;
         session.begin();
+        std::cout << ">> 11" << std::endl;
         try {
             Poco::Data::Statement statement(session);
-
+            std::cout << ">> 12" << std::endl;
             statement << "INSERT INTO " << TABLE_NAME 
                 << " (name, description, cost, seller_id) VALUES(?, ?, ?, ?)",
                 use(_name),
@@ -197,23 +200,30 @@ namespace database {
                 use(_seller_id);
 
             statement.execute();
+            std::cout << ">> 13" << std::endl;
 
             Poco::Data::Statement select(session);
+            std::cout << ">> 14" << std::endl;
             select << "SELECT LAST_INSERT_ID()",
                 into(_id),
                 range(0, 1);
+            std::cout << ">> 15" << std::endl;
 
             if (!select.done()){
+                std::cout << ">> 16" << std::endl;
                 select.execute();
             }
+            std::cout << ">> 17" << std::endl;
             session.commit();
-            
+            std::cout << ">> 18" << std::endl;
             std::cout << "New entity id:" << _id << std::endl;
         } catch (Poco::Data::MySQL::ConnectionException &e) {
+            std::cout << ">> 19" << std::endl;
             session.rollback();
             std::cout << "connection:" << e.what() << " :: " << e.message() << std::endl;
             throw;
         } catch (Poco::Data::MySQL::StatementException &e) {
+            std::cout << ">> 20" << std::endl;
             session.rollback();
             std::cout << "statement:" << e.what() << " :: " << e.message() << std::endl;
             throw;
@@ -222,8 +232,10 @@ namespace database {
 
     void Product::save_to_db() {
         if (_id > 0) {
+            std::cout << ">> 7" << std::endl;
             update_entity();
         } else {
+            std::cout << ">> 8" << std::endl;
             insert_entity();
         }
     }
@@ -271,10 +283,10 @@ namespace database {
             lot.creattion_date() = object->getValue<Poco::DateTime>("creation_date");
         }
 
-        if (object->has("seller")) {
-            std::string seller_json = object->getValue<std::string>("seller");
-            lot.seller() = User::fromJson(seller_json);
-        }
+        // if (object->has("seller")) {
+        //     std::string seller_json = object->getValue<std::string>("seller");
+        //     lot.seller() = User::fromJson(seller_json);
+        // }
 
         return lot;
     }
