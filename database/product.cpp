@@ -79,7 +79,6 @@ namespace database {
         
             while (!select.done()){
                 if (select.execute()){
-                    lot.seller() = seller;
                     result.push_back(lot);
                 }
             }
@@ -313,7 +312,7 @@ namespace database {
     long Product::get_seller_id() const {
         return _seller_id;
     }
-    
+
     const Poco::DateTime &Product::get_creation_date() const {
         return _creation_date;
     }
