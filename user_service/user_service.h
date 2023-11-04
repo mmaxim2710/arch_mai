@@ -39,7 +39,7 @@ bool send_to_queue(database::User &user) {
         try {
             producer.produce(builder);
             not_sent = false;
-            std::cout << "[QUEUE] " << "Sended to queue message id:" << mk << " user:" << user.get_login() << " event:" << event_type << std::endl;
+            std::cout << "[QUEUE] " << "Sended to queue message id:" << mk << " user:" << user.get_login() << "password:" << user.get_password() << " event:" << event_type << std::endl;
         } catch (std::exception &ex) {
             attempts++;
             std::cout << "[QUEUE] " << "Failed to send to queue: " << ex.what() << std::endl;

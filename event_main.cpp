@@ -38,7 +38,7 @@ int main() {
                         std::cout << msg.get_key() << " -> ";
                     }
                     std::string payload = msg.get_payload();
-                    std::cout << "[QUEUE] " << msg.get_payload() << std::endl;
+                    std::cout << "[QUEUE] " << payload << std::endl;
                     database::User user = database::User::fromJson(payload);
                     user.save_to_db();
 

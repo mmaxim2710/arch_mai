@@ -158,6 +158,7 @@ class AuthRequestHandler : public HTTPRequestHandler {
                 if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) {
                     if (hasSubstr(request.getURI(), "/sign/up")) {
                         std::string body = extractBody(request.stream(), request.getContentLength());
+                        std::cout << "extracted body " << body << std::endl;
                         long id = create_user(body);
                         response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_CREATED);
                         response.setChunkedTransferEncoding(true);

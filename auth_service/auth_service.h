@@ -55,7 +55,7 @@ long create_user(std::string body) {
     if (validate_user(user, validation_message)) {
         std::cout << "Creating new user: " << body << std::endl;
         send_to_queue(user);
-        return 0;
+        return user.get_id();
         // user.save_to_db();
         // return user.get_id();
     } else {
