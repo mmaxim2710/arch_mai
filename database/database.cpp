@@ -25,8 +25,8 @@ namespace database{
         std::cout << "Connection string: " << _connection_string << std::endl; 
         Poco::Data::MySQL::Connector::registerConnector();
         std::cout << "Connector registered" << std::endl; 
-        _pool = std::make_unique<Poco::Data::SessionPool>(Poco::Data::MySQL::Connector::KEY, _connection_string);
-        std::cout << "Session pool created" << std::endl; 
+        // _pool = std::make_unique<Poco::Data::SessionPool>(Poco::Data::MySQL::Connector::KEY, _connection_string);
+        // std::cout << "Session pool created" << std::endl; 
     }
 
     Database& Database::get(){
@@ -36,14 +36,8 @@ namespace database{
     }
 
     Poco::Data::Session Database::create_session(){
-        std::cout << "32" << std::endl;
-        try {
-            Poco::Data::Session pool = _pool->get();
-            return Poco::Data::Session(pool);
-        } catch (Poco::Data::SessionPoolExhaustedException &e) {
-            std::cout << "[ERROR]: the maximum number of sessions for this pool has already been created: " << e.what() << std::endl;
-        }
-        return Poco::Data::Session(Poco::Data::MySQL::Connector::KEY, _connection_string);
+        // return Poco::Data::Session(_pool->get());
+        return Poco::Data::Session(Poco::Data::SessionFactory::instance().create(Poco::Data::MySQL::Connector::KEY, _connection_string));
     }
 
     size_t Database::get_max_shard() {
