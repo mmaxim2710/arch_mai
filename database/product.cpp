@@ -28,44 +28,37 @@ namespace database {
             
             std::vector<Product> result;
             Product lot;
-            User seller;
 
             std::vector<std::string> conditions;
 
-            select << "select p.id, p.name, p.description, p.cost, p.seller_id, p.creation_date, "
-                << "u.id, u.login, u.name, u.email, u.deleted from "  << TABLE_NAME
-                << " p inner join _user u on u.id = p.seller_id where p.deleted = false",
+            select << "select id, name, description, cost, seller_id, creation_date from "  << TABLE_NAME
+                << " where deleted = false",
                 into(lot._id),
                 into(lot._name),
                 into(lot._description),
                 into(lot._cost),
                 into(lot._seller_id),
                 into(lot._creation_date),
-                into(lot._seller.id()),
-                into(lot._seller.login()),
-                into(lot._seller.name()),
-                into(lot._seller.email()),
-                into(lot._seller.deleted()),
                 range(0, 1);
 
             
             for(std::pair<std::string, std::string> key_value: params) {
                 std::string value = key_value.second;
                 if (key_value.first == "id") {
-                    select << "and p.id = ? ";
+                    select << "and id = ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "cost_min") {
-                    select << "and p.cost >= ? ";
+                    select << "and cost >= ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "cost_max") {
-                    select << "and p.cost <= ? ";
+                    select << "and cost <= ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "seller_id") {
-                    select << "and p.seller_id = ? ";
+                    select << "and seller_id = ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "name") {
                     std::replace(value.begin(), value.end(), ' ', '%');
-                    select << "and p.lower(name) like lower(?) ";
+                    select << "and lower(name) like lower(?) ";
                     select.bind("%" + value + "%");
                 } else if (key_value.first == "creation_date_start") {
                     int tzd;
@@ -110,9 +103,8 @@ namespace database {
             Poco::Data::Statement select(session);
             Product lot;
 
-            select << "select p.id, p.name, p.description, p.cost, p.seller_id, p.creation_date, p.deleted, "
-                << "u.id, u.login, u.name, u.email, u.deleted from "  << TABLE_NAME
-                << " p inner join _user u on u.id = p.seller_id where p.id = ?",
+            select << "select id, name, description, cost, seller_id, creation_date, deleted from "  << TABLE_NAME
+                << " id = ?",
                 into(lot._id),
                 into(lot._name),
                 into(lot._description),
@@ -120,11 +112,6 @@ namespace database {
                 into(lot._seller_id),
                 into(lot._creation_date),
                 into(lot._deleted),
-                into(lot._seller.id()),
-                into(lot._seller.login()),
-                into(lot._seller.name()),
-                into(lot._seller.email()),
-                into(lot._seller.deleted()),
                 use(id),
                 range(0, 1);
         
@@ -251,10 +238,6 @@ namespace database {
         root->set("creation_date", _creation_date);
         root->set("deleted", _deleted);
 
-        if (_seller.get_id() > 0) {
-            root->set("seller", _seller.toJSON());
-        }
-
         return root;
     }
 
@@ -311,10 +294,6 @@ namespace database {
         return _seller_id;
     }
 
-    User &Product::seller() {
-        return _seller;
-    }
-
     long Product::get_id() const {
         return _id;
     }
@@ -334,11 +313,7 @@ namespace database {
     long Product::get_seller_id() const {
         return _seller_id;
     }
-
-    const User &Product::get_seller() const {
-        return _seller;
-    }
-
+    
     const Poco::DateTime &Product::get_creation_date() const {
         return _creation_date;
     }

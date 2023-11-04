@@ -12,7 +12,7 @@ namespace database{
     class Database{
         private:
             std::string _connection_string;
-            // std::unique_ptr<Poco::Data::SessionPool> _pool;
+            std::unique_ptr<Poco::Data::SessionPool> _pool;
             Database();
         public:
             static Database& get();

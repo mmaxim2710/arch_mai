@@ -135,7 +135,6 @@ class ProductRequesthandler: public HTTPRequestHandler {
                         std::cout << "Found total " << result.size() << std::endl;
                         Poco::JSON::Array arr;
                         for (database::Product product: result) {
-                            // without toJson don't work, dunno why
                             arr.add(product.toJSON());
                         }
                         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);

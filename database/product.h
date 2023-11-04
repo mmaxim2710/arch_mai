@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include "./user.h"
 #include "Poco/JSON/Object.h"
 #include <ctime>
 
@@ -16,7 +15,6 @@ namespace database {
             float _cost;
             long _seller_id;
             bool _deleted;
-            User _seller = User::empty();
             Poco::DateTime _creation_date;
 
             void insert_entity();
