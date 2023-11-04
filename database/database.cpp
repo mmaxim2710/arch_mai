@@ -37,7 +37,12 @@ namespace database{
 
     Poco::Data::Session Database::create_session(){
         std::cout << "32" << std::endl;
-        return Poco::Data::Session(_pool->get());
+        try {
+            Poco::Data::Session pool = _pool->get();
+            return Poco::Data::Session(pool);
+        } catch (Poco::Data::SessionPoolExhaustedException &e) {
+            std::cout << "[ERROR]: the maximum number of sessions for this pool has already been created: " << e.what() << std::endl;
+        }
     }
 
     size_t Database::get_max_shard() {
