@@ -30,11 +30,13 @@ namespace database{
     }
 
     Database& Database::get(){
+        std::cout << "31" << std::endl;
         static Database _instance;
         return _instance;
     }
 
     Poco::Data::Session Database::create_session(){
+        std::cout << "32" << std::endl;
         return Poco::Data::Session(_pool->get());
     }
 
