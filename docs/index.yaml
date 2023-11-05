@@ -271,7 +271,7 @@ paths:
             type: string
       responses:
         200:
-          description: List of users
+          description: List of products
           content:
             application/json:
               schema:
@@ -366,8 +366,6 @@ components:
           type: boolean
         seller_id:
           $ref: '#/components/schemas/user_id'
-        seller:
-          $ref: '#/components/schemas/user'
     Error:
       type: object
       required:
