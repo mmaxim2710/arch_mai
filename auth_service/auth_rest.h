@@ -164,7 +164,7 @@ class AuthRequestHandler : public HTTPRequestHandler {
                         response.setChunkedTransferEncoding(true);
                         response.setContentType("application/json");
                         Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-                        root->set("id", id);
+                        root->set("success", true);
                         std::ostream &ostr = response.send();
                         Poco::JSON::Stringifier::stringify(root, ostr);
                     }

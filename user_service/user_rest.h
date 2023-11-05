@@ -125,7 +125,6 @@ class UserRequestHandler : public HTTPRequestHandler {
                 }
                 std::cout << "Authorized user " << login << std::endl;
 
-                // TODO bad code, need refactor
                 if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_PUT) {
                     std::string body = extractBody(request.stream(), request.getContentLength());
                     edit_user(id, body);

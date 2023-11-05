@@ -22,9 +22,6 @@ using Poco::Data::Statement;
 namespace database {
     long User::auth(std::string &login, std::string &password) {
         std::cout << "Trying to auth " << login << "::" << password << std::endl;
-        
-        // Сначала пробуем подтянуть юзера из кешей и авторизовать. Если не получилось идем в бд.
-        // Опасное наличие пароль в кешах. Сделано только для примера.
         User user = get_from_cache_by_login(login);
         if (user.get_id() > 0) {
             std::cout << "Got user from cache!" << std::endl;
