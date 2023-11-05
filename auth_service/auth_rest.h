@@ -160,6 +160,7 @@ class AuthRequestHandler : public HTTPRequestHandler {
                         std::string body = extractBody(request.stream(), request.getContentLength());
                         std::cout << "extracted body " << body << std::endl;
                         long id = create_user(body);
+                        std::cout << id << std::endl;
                         response.setStatus(Poco::Net::HTTPResponse::HTTPStatus::HTTP_CREATED);
                         response.setChunkedTransferEncoding(true);
                         response.setContentType("application/json");
