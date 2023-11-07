@@ -271,6 +271,13 @@ services:
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
       AUTH_SERVICE_HOST: auth_service
       PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      MAX_SHARD: 1
+      SEQUENCE_SHARD: 2
+      QUEUE_HOST: kafka1:9092
+      QUEUE_TOPIC: event_server
+      QUEUE_GROUP_ID: 0
+      CACHE_HOST: cache
+      CACHE_PORT: ${CACHE_PORT}
     ports:
       - ${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}
     networks:
