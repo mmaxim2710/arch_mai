@@ -213,6 +213,9 @@ namespace database {
             session.rollback();
             std::cout << "statement:" << e.what() << " :: " << e.message() << std::endl;
             throw;
+        } catch (...) {
+            std::cout << "Other exception happened in Product::insert_entity()" << std::endl;
+            throw;
         }
     }
 
