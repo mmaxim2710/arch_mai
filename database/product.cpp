@@ -34,7 +34,7 @@ namespace database {
 
             select << "select p.id, p.name, p.description, p.cost, p.seller_id, p.creation_date, "
                 << "u.id, u.login, u.name, u.email, u.deleted from "  << TABLE_NAME
-                << " p inner join _user u on u.id = p.seller_id where p.deleted = false",
+                << " p inner join _user u on u.id = p.seller_id where p.deleted = false ",
                 into(lot._id),
                 into(lot._name),
                 into(lot._description),
@@ -111,8 +111,8 @@ namespace database {
             Product lot;
 
             select << "select p.id, p.name, p.description, p.cost, p.seller_id, p.creation_date, p.deleted, "
-                << "u.id, u.login, u.name, u.email, u.deleted from "  << TABLE_NAME
-                << " p inner join _user u on u.id = p.seller_id where p.id = ?",
+                << " u.id, u.login, u.name, u.email, u.deleted from "  << TABLE_NAME
+                << " p inner join _user u on u.id = p.seller_id where p.id = ? ",
                 into(lot._id),
                 into(lot._name),
                 into(lot._description),
