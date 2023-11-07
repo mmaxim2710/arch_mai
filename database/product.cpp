@@ -86,7 +86,7 @@ namespace database {
         
             while (!select.done()){
                 if (select.execute()){
-                    lot.seller() = seller;
+                    // lot.seller() = seller;
                     result.push_back(lot);
                 }
             }

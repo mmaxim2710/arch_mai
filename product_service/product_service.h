@@ -43,7 +43,7 @@ static long create_product(long &user_id, std::string user_login, std::string &b
     if (!validate_product(product, validation_result)) {
         throw validation_exception(validation_result);
     }
-    database::User seller = database::User::get_by_id(user_id, false); // если что, тут мб ошибка
+    database::User seller = database::User::get_by_id(user_id, true); // если что, тут мб ошибка
 
     if (seller.get_id() <= 0) {
         throw validation_exception("Can't find user by id " + std::to_string(user_id));
@@ -73,11 +73,6 @@ void edit_product(long &user_id, std::string &body) {
             std::string value = obj->getValue<std::string>("name");
             check_name(value, validation_message);
             product.name() = obj->getValue<std::string>("name");
-        }
-        if (obj->has("description")) {
-            std::string value = obj->getValue<std::string>("description");
-            check_email(value, validation_message);
-            product.description() = obj->getValue<std::string>("description");
         }
         if (obj->has("cost")) {
             if (obj->getValue<float>("cost") > 0) {
