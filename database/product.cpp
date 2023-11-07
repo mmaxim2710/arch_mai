@@ -28,37 +28,44 @@ namespace database {
             
             std::vector<Product> result;
             Product lot;
+            User seller;
 
             std::vector<std::string> conditions;
 
-            select << "select id, name, description, cost, seller_id, creation_date from "  << TABLE_NAME
-                << " where deleted = false",
+            select << "select p.id, p.name, p.description, p.cost, p.seller_id, p.creation_date, "
+                << "u.id, u.login, u.name, u.email, u.deleted from "  << TABLE_NAME
+                << " p inner join _user u on u.id = p.seller_id where p.deleted = false",
                 into(lot._id),
                 into(lot._name),
                 into(lot._description),
                 into(lot._cost),
                 into(lot._seller_id),
                 into(lot._creation_date),
+                into(lot._seller.id()),
+                into(lot._seller.login()),
+                into(lot._seller.name()),
+                into(lot._seller.email()),
+                into(lot._seller.deleted()),
                 range(0, 1);
 
             
             for(std::pair<std::string, std::string> key_value: params) {
                 std::string value = key_value.second;
                 if (key_value.first == "id") {
-                    select << "and id = ? ";
+                    select << "and p.id = ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "cost_min") {
-                    select << "and cost >= ? ";
+                    select << "and p.cost >= ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "cost_max") {
-                    select << "and cost <= ? ";
+                    select << "and p.cost <= ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "seller_id") {
-                    select << "and seller_id = ? ";
+                    select << "and p.seller_id = ? ";
                     select.bind(atoi(value.c_str()));
                 } else if (key_value.first == "name") {
                     std::replace(value.begin(), value.end(), ' ', '%');
-                    select << "and lower(name) like lower(?) ";
+                    select << "and p.lower(name) like lower(?) ";
                     select.bind("%" + value + "%");
                 } else if (key_value.first == "creation_date_start") {
                     int tzd;
@@ -79,6 +86,7 @@ namespace database {
         
             while (!select.done()){
                 if (select.execute()){
+                    lot.seller() = seller;
                     result.push_back(lot);
                 }
             }
@@ -102,8 +110,9 @@ namespace database {
             Poco::Data::Statement select(session);
             Product lot;
 
-            select << "select id, name, description, cost, seller_id, creation_date, deleted from "  << TABLE_NAME
-                << " id = ?",
+            select << "select p.id, p.name, p.description, p.cost, p.seller_id, p.creation_date, p.deleted, "
+                << "u.id, u.login, u.name, u.email, u.deleted from "  << TABLE_NAME
+                << " p inner join _user u on u.id = p.seller_id where p.id = ?",
                 into(lot._id),
                 into(lot._name),
                 into(lot._description),
@@ -111,6 +120,11 @@ namespace database {
                 into(lot._seller_id),
                 into(lot._creation_date),
                 into(lot._deleted),
+                into(lot._seller.id()),
+                into(lot._seller.login()),
+                into(lot._seller.name()),
+                into(lot._seller.email()),
+                into(lot._seller.deleted()),
                 use(id),
                 range(0, 1);
         
@@ -170,14 +184,11 @@ namespace database {
     }
 
     void Product::insert_entity() {
-        std::cout << ">> 9" << std::endl;
         Poco::Data::Session session = database::Database::get().create_session();
-        std::cout << ">> 10" << std::endl;
         session.begin();
-        std::cout << ">> 11" << std::endl;
         try {
             Poco::Data::Statement statement(session);
-            std::cout << ">> 12" << std::endl;
+
             statement << "INSERT INTO " << TABLE_NAME 
                 << " (name, description, cost, seller_id) VALUES(?, ?, ?, ?)",
                 use(_name),
@@ -186,45 +197,33 @@ namespace database {
                 use(_seller_id);
 
             statement.execute();
-            std::cout << ">> 13" << std::endl;
 
             Poco::Data::Statement select(session);
-            std::cout << ">> 14" << std::endl;
             select << "SELECT LAST_INSERT_ID()",
                 into(_id),
                 range(0, 1);
-            std::cout << ">> 15" << std::endl;
 
             if (!select.done()){
-                std::cout << ">> 16" << std::endl;
                 select.execute();
             }
-            std::cout << ">> 17" << std::endl;
             session.commit();
-            std::cout << ">> 18" << std::endl;
+            
             std::cout << "New entity id:" << _id << std::endl;
         } catch (Poco::Data::MySQL::ConnectionException &e) {
-            std::cout << ">> 19" << std::endl;
             session.rollback();
             std::cout << "connection:" << e.what() << " :: " << e.message() << std::endl;
             throw;
         } catch (Poco::Data::MySQL::StatementException &e) {
-            std::cout << ">> 20" << std::endl;
             session.rollback();
             std::cout << "statement:" << e.what() << " :: " << e.message() << std::endl;
-            throw;
-        } catch (...) {
-            std::cout << "Other exception happened in Product::insert_entity()" << std::endl;
             throw;
         }
     }
 
     void Product::save_to_db() {
         if (_id > 0) {
-            std::cout << ">> 7" << std::endl;
             update_entity();
         } else {
-            std::cout << ">> 8" << std::endl;
             insert_entity();
         }
     }
@@ -239,6 +238,10 @@ namespace database {
         root->set("seller_id", _seller_id);
         root->set("creation_date", _creation_date);
         root->set("deleted", _deleted);
+
+        if (_seller.get_id() > 0) {
+            root->set("seller", _seller.toJSON());
+        }
 
         return root;
     }
@@ -259,7 +262,7 @@ namespace database {
         
         lot.id() = getOrDefault<long>(object, "id", 0);
         lot.name() = getOrDefault<std::string>(object, "name", "");
-        lot.description() = getOrDefault<std::string>(object, "description", "");
+        lot.description() = getOrDefault<std::string>(object, "name", "");
         lot.cost() = getOrDefault<float>(object, "cost", 0);
         lot.seller_id() = getOrDefault<long>(object, "seller_id", 0);
         lot.deleted() = getOrDefault<bool>(object, "deleted", false);
@@ -268,10 +271,10 @@ namespace database {
             lot.creattion_date() = object->getValue<Poco::DateTime>("creation_date");
         }
 
-        // if (object->has("seller")) {
-        //     std::string seller_json = object->getValue<std::string>("seller");
-        //     lot.seller() = User::fromJson(seller_json);
-        // }
+        if (object->has("seller")) {
+            std::string seller_json = object->getValue<std::string>("seller");
+            lot.seller() = User::fromJson(seller_json);
+        }
 
         return lot;
     }
@@ -296,6 +299,10 @@ namespace database {
         return _seller_id;
     }
 
+    User &Product::seller() {
+        return _seller;
+    }
+
     long Product::get_id() const {
         return _id;
     }
@@ -314,6 +321,10 @@ namespace database {
 
     long Product::get_seller_id() const {
         return _seller_id;
+    }
+
+    const User &Product::get_seller() const {
+        return _seller;
     }
 
     const Poco::DateTime &Product::get_creation_date() const {

@@ -31,11 +31,11 @@ bool validate_product(database::Product &product, std::string &message) {
     return result;
 }
 
-static long create_product(long user_id, std::string user_login, std::string &body) {
+static long create_product(long &user_id, std::string user_login, std::string &body) {
     if (body.length() == 0) {
         throw validation_exception("Body is missing!");
     }
-    std::cout << "Creating new product by " << user_login << " :: " << user_id << std::endl;
+    std::cout << "Creating new product by " << user_login << " :: " + user_id << std::endl;
     std::cout << body << std::endl;
 
     database::Product product = database::Product::fromJson(body);
@@ -43,15 +43,14 @@ static long create_product(long user_id, std::string user_login, std::string &bo
     if (!validate_product(product, validation_result)) {
         throw validation_exception(validation_result);
     }
-    std::cout << ">> 6" << std::endl;
-    // database::User seller = database::User::get_by_id(user_id, false);
+    database::User seller = database::User::get_by_id(user_id, false); // если что, тут мб ошибка
 
-    // if (seller.get_id() <= 0) {
-    //     throw validation_exception("Can't find user by id " + std::to_string(user_id));
-    // }
-    // product.seller_id() = seller.get_id();
+    if (seller.get_id() <= 0) {
+        throw validation_exception("Can't find user by id " + std::to_string(user_id));
+    }
+    product.seller_id() = seller.get_id();
     product.save_to_db();
-    std::cout << ">> 21" << std::endl;
+
     return product.get_id();
 }
 

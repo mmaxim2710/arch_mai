@@ -124,7 +124,7 @@ class ProductRequesthandler: public HTTPRequestHandler {
                 if (!validateToken(scheme, token, id, login)) {
                     throw access_denied_exception("Failed to authorize user");
                 }
-                std::cout << "Authorized user " << login << " with id=" << id << std::endl;
+                std::cout << "Authorized user " << login << " with id " << id << std::endl;
 
                 if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_GET) {
                     const Poco::URI uri(request.getURI());
@@ -144,9 +144,7 @@ class ProductRequesthandler: public HTTPRequestHandler {
                         Poco::JSON::Stringifier::stringify(arr, ostr);
                     }
                 } else if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST) {
-                    std::cout << "[1] now user id from token is " << id << std::endl;
                     std::string body = extractBody(request.stream(), request.getContentLength());
-                    std::cout << "Creating prodcut for user id=" << id << ", login=" << login << std::endl;
                     long created = create_product(id, login, body);
                     response.setStatus(Poco::Net::HTTPResponse::HTTP_CREATED);
                     response.setChunkedTransferEncoding(true);
