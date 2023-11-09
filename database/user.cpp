@@ -309,12 +309,7 @@ namespace database {
         return key;
     }
 
-    // не идеальная реализация
-    // По нормальному надо бы сразу строку возвращать, тк делается бесполезная работа
-    // Но опять же, сделано в учебных целях, хотел понять, как его можно туда обратно гонять
-    // И на сколько это будет долго
     bool User::search_by_cache(User &like_user, std::vector<User> &search_results) {
-        // Формируем ключ для поиска
         std::string key = build_search_cache_key(like_user);
         try {
             std::cout << "Getting search results by key " << key << std::endl;
@@ -470,11 +465,6 @@ namespace database {
         }
     }
 
-    /*
-        Я не был уверен, по какому ключу будут чаще вытаскиваться юзеры из кеша.
-        По идее - login, тк он используется при авторизации и он уникален.
-        Но на всякий реализовал так же по id.
-    */
     void User::save_to_cache() {
         try {
             std::stringstream ss;
