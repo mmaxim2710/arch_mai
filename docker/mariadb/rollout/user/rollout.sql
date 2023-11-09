@@ -1,4 +1,4 @@
-
+create sequence main_id_sequence;
 create table _roles (
     id INT NOT NULL AUTO_INCREMENT, 
     name varchar(32) not null unique,
